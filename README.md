@@ -7,7 +7,7 @@
 
 # ✨ MindFlow — 沉浸式 Markdown 笔记
 
-> 一款现代化的本地 Markdown 笔记应用，拥有实时预览、代码高亮、目录导航和图片管理等功能。数据完全存储在浏览器本地，无需后端服务。
+> 一款现代化的本地 Markdown 笔记应用，拥有实时预览、代码高亮、目录导航、多主题切换、文件夹分类和图片管理等功能。数据完全存储在浏览器本地，无需后端服务。
 
 ---
 
@@ -54,14 +54,28 @@
 - **可折叠** — 一键收起/展开目录面板
 - **智能过滤** — 跳过代码块内的 `#` 符号
 
+### 🎭 多主题系统
+- **6 种精选主题** — 午夜深蓝 🌑 / GitHub 暗色 🐙 / 翡翠绿 🌲 / 玫瑰粉 🌸 / 经典亮色 ☀️ / 落日橙 🌅
+- **一键切换** — 侧边栏顶部下拉菜单，含主题色预览
+- **自动记忆** — 主题选择持久化到 LocalStorage，刷新后保持
+- **CSS 变量驱动** — 基于 CSS Custom Properties，所有组件统一响应主题变化
+
+### 📁 文件夹分类
+- **创建文件夹** — 侧边栏文件夹区域，点击 + 号内联创建
+- **重命名 / 删除** — hover 文件夹显示操作图标，删除时笔记自动移到"未分类"
+- **按文件夹筛选** — 支持"全部笔记"、各文件夹、"未分类"三种视图
+- **笔记移动** — 笔记卡片 hover 显示文件夹图标，点击弹出移动菜单
+- **智能创建** — 在某文件夹视图下新建的笔记自动归入该文件夹
+- **笔记计数** — 每个文件夹旁显示包含的笔记数量
+
 ### 📂 导入 / 导出
 - **导出当前笔记** — 保存为 `.md` 文件
 - **导出全部** — JSON 格式批量备份所有笔记
+- **导出为 PDF** — 通过浏览器打印功能，支持任意长度的多页内容
 - **导入笔记** — 支持 `.md` 和 `.json` 文件导入
 
 ### 🔍 其他特性
 - **全文搜索** — 按标题和内容即时过滤笔记列表
-- **深色主题** — 精心调配的暗色配色方案，长时间使用不疲劳
 - **自定义滚动条** — 统一的极简滚动条样式
 - **渐入动画** — 预览内容渲染时带有微妙的淡入效果
 
@@ -73,9 +87,9 @@
 |------|------|
 | 框架 | React 19 + TypeScript 5.9 |
 | 构建工具 | Vite 7 |
-| 样式 | Tailwind CSS 4 |
+| 样式 | Tailwind CSS 4 + CSS Custom Properties |
 | Markdown | react-markdown + remark-gfm + rehype-raw |
-| 代码高亮 | react-syntax-highlighter |
+| 代码高亮 | react-syntax-highlighter (Prism) |
 | 数据持久化 | LocalStorage |
 
 ---
@@ -91,8 +105,8 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/ccc0508/Markdown-Note.git
+cd Markdown-Note
 
 # 安装依赖
 npm install
@@ -118,35 +132,44 @@ npm run preview
 src/
 ├── App.tsx                          # 应用根组件
 ├── main.tsx                         # 入口文件
-├── index.css                        # 全局样式 + Markdown 预览样式
+├── index.css                        # 全局样式（CSS 变量驱动）
+├── themes.ts                        # 6 种主题定义
 ├── components/
 │   ├── Editor/
 │   │   └── Editor.tsx               # Markdown 编辑器（含图片上传）
 │   ├── NoteList/
-│   │   └── NoteList.tsx             # 笔记列表侧边栏
-│   └── Preview/
-│       ├── Preview.tsx              # Markdown 实时预览
-│       ├── CodeBlock.tsx            # 代码块渲染 + 复制按钮
-│       └── TableOfContents.tsx      # 目录导航组件
+│   │   ├── NoteList.tsx             # 笔记列表侧边栏
+│   │   ├── NoteItem.tsx             # 单条笔记卡片
+│   │   ├── SearchBar.tsx            # 搜索栏
+│   │   └── FolderList.tsx           # 文件夹列表（新增）
+│   ├── Preview/
+│   │   ├── Preview.tsx              # Markdown 实时预览
+│   │   ├── CodeBlock.tsx            # 代码块渲染 + 复制按钮
+│   │   └── TableOfContents.tsx      # 目录导航组件
+│   └── ThemeSwitcher/
+│       └── ThemeSwitcher.tsx        # 主题切换下拉菜单
 ├── hooks/
-│   ├── useNotes.ts                  # 笔记 CRUD + 搜索 + 导入导出
+│   ├── useNotes.ts                  # 笔记 + 文件夹 CRUD / 搜索 / 导入导出
+│   ├── useTheme.ts                  # 主题状态管理 + CSS 变量注入
 │   └── useDebounce.ts              # 防抖 Hook
 ├── types/
-│   └── note.ts                      # Note 类型定义
+│   └── note.ts                      # Note + Folder 类型定义
 └── utils/
-    └── storage.ts                   # LocalStorage 工具 + 图片存储
+    └── storage.ts                   # LocalStorage 工具 + 图片 / 文件夹存储
 ```
 
 ---
 
 ## 🗺️ 路线图
 
-- [ ] 文件夹 / 标签分类
+- [x] 文件夹分类
+- [x] 多主题支持（6 种内置主题）
+- [x] PDF 导出
 - [ ] Markdown 快捷工具栏（加粗、斜体、链接等）
-- [ ] 多主题支持（浅色 / 深色 / 自定义）
 - [ ] 云端同步（可选 WebDAV / GitHub Gist）
 - [ ] PWA 离线支持
 - [ ] 笔记间双向链接 `[[wikilink]]`
+- [ ] 标签系统
 
 ---
 
