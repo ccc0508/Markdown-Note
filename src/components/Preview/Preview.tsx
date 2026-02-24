@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useCallback, type ReactNode } from 'react';
+import React, { useMemo, useCallback, type ReactNode } from 'react';
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -39,35 +39,11 @@ interface PreviewProps {
 }
 
 export const Preview = React.memo(function Preview({ content, title, onContentChange }: PreviewProps) {
-    // 建立 checkbox 渲染索引 → 源内容行号的映射
-    const checkboxLineMap = useMemo(() => {
-        const map: number[] = [];
-        const lines = content.split('\n');
-        let inCodeBlock = false;
-        lines.forEach((line, lineIndex) => {
-            const trimmed = line.trimStart();
-            if (trimmed.startsWith('```')) {
-                inCodeBlock = !inCodeBlock;
-                return;
-            }
-            if (inCodeBlock) return;
-            if (/^[-*+]\s*\[([ xX])\]/.test(trimmed)) {
-                map.push(lineIndex);
-            }
-        });
-        return map;
-    }, [content]);
-
-    const checkboxIndexRef = useRef(0);
-    checkboxIndexRef.current = 0;
-
-    // 切换指定行号的任务列表复选框
-    const toggleCheckbox = useCallback((renderIndex: number) => {
+    // 切换指定源码行号的任务列表复选框
+    const toggleCheckboxAtLine = useCallback((lineIndex: number) => {
         if (!onContentChange) return;
-        const lineIndex = checkboxLineMap[renderIndex];
-        if (lineIndex === undefined) return;
-
         const lines = content.split('\n');
+        if (lineIndex < 0 || lineIndex >= lines.length) return;
         const line = lines[lineIndex];
         if (/\[ \]/.test(line)) {
             lines[lineIndex] = line.replace('[ ]', '[x]');
@@ -75,7 +51,8 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
             lines[lineIndex] = line.replace(/\[[xX]\]/, '[ ]');
         }
         onContentChange(lines.join('\n'));
-    }, [content, onContentChange, checkboxLineMap]);
+    }, [content, onContentChange]);
+
     const components: Components = {
         code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '');
@@ -101,59 +78,64 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
                 </code>
             );
         },
-        // 自定义链接：新窗口打开
-        a({ children, href, ...props }) {
-            return (
-                <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2 decoration-indigo-400/30 hover:decoration-indigo-300/50 transition-colors"
-                    {...props}
-                >
-                    {children}
-                </a>
-            );
+        // 块级代码
+        pre({ children }) {
+            return <div>{children}</div>;
         },
-        // 自定义表格
+        // 表格
         table({ children, ...props }) {
             return (
-                <div className="my-4 overflow-x-auto rounded-lg border border-white/10">
-                    <table className="w-full" {...props}>
-                        {children}
-                    </table>
+                <div className="overflow-x-auto my-4 rounded-xl border border-white/10">
+                    <table className="w-full text-sm" {...props}>{children}</table>
                 </div>
             );
         },
+        thead({ children, ...props }) {
+            return <thead className="bg-white/5 text-slate-300" {...props}>{children}</thead>;
+        },
         th({ children, ...props }) {
             return (
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-300 bg-white/5 border-b border-white/10" {...props}>
+                <th className="px-4 py-2.5 text-left font-semibold tracking-wide border-b border-white/10" {...props}>
                     {children}
                 </th>
             );
         },
         td({ children, ...props }) {
             return (
-                <td className="px-4 py-2.5 text-sm text-slate-400 border-b border-white/5" {...props}>
+                <td className="px-4 py-2.5 border-b border-white/5 text-slate-400" {...props}>
                     {children}
                 </td>
             );
         },
-        // 自定义引用块
+        // 引用块
         blockquote({ children, ...props }) {
             return (
                 <blockquote
-                    className="my-4 pl-4 border-l-4 border-indigo-500/40 bg-indigo-500/5 py-3 pr-4 rounded-r-lg text-slate-400 italic"
+                    className="border-l-4 border-indigo-500/30 pl-4 my-4 text-slate-400 italic bg-indigo-500/5 py-3 pr-4 rounded-r-lg"
                     {...props}
                 >
                     {children}
                 </blockquote>
             );
         },
-        // 自定义分割线
+        // 水平线
         hr({ ...props }) {
             return (
-                <hr className="my-8 border-none h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" {...props} />
+                <hr className="my-8 border-none h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" {...props} />
+            );
+        },
+        // 链接
+        a({ children, href, ...props }) {
+            return (
+                <a
+                    href={href}
+                    className="text-indigo-400 hover:text-indigo-300 underline decoration-indigo-500/30 hover:decoration-indigo-400/50 transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...props}
+                >
+                    {children}
+                </a>
             );
         },
         // 自定义图片渲染
@@ -198,15 +180,32 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
                 </mark>
             );
         },
-        // 自定义复选框：可点击切换
-        input(props) {
+        // 任务列表 li：用 AST 节点位置信息打上源码行号
+        li({ node, children, className, ...props }: any) {
+            if (className === 'task-list-item' && node?.position) {
+                const sourceLine = node.position.start.line - 1;
+                return (
+                    <li className={className} data-source-line={sourceLine} {...props}>
+                        {children}
+                    </li>
+                );
+            }
+            return <li className={className} {...props}>{children}</li>;
+        },
+        // 任务列表复选框：从父 li 读取行号，点击时切换
+        input(props: any) {
             if (props.type === 'checkbox') {
-                const currentIndex = checkboxIndexRef.current++;
                 return (
                     <input
                         type="checkbox"
-                        checked={props.checked}
-                        onChange={() => toggleCheckbox(currentIndex)}
+                        checked={!!props.checked}
+                        onChange={(e) => {
+                            const li = (e.target as HTMLElement).closest('li[data-source-line]');
+                            if (li) {
+                                const lineIndex = parseInt(li.getAttribute('data-source-line')!, 10);
+                                toggleCheckboxAtLine(lineIndex);
+                            }
+                        }}
                     />
                 );
             }
