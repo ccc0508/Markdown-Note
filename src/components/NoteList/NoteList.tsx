@@ -1,10 +1,12 @@
 import React from 'react';
-import type { Note } from '../../types/note';
+import type { Note, Folder } from '../../types/note';
 import { SearchBar } from './SearchBar';
 import { NoteItem } from './NoteItem';
+import { FolderList } from './FolderList';
 
 interface NoteListProps {
     notes: Note[];
+    allNotes: Note[];
     activeNoteId: string | null;
     searchQuery: string;
     onSearchChange: (value: string) => void;
@@ -15,11 +17,20 @@ interface NoteListProps {
     onExportAll: () => void;
     onExportPdf: () => void;
     onImport: () => void;
+    onMoveNoteToFolder: (noteId: string, folderId: string | null) => void;
     themeSwitcher?: React.ReactNode;
+    // 文件夹
+    folders: Folder[];
+    activeFolderId: string | null;
+    onSelectFolder: (id: string | null) => void;
+    onCreateFolder: (name: string) => void;
+    onRenameFolder: (id: string, name: string) => void;
+    onDeleteFolder: (id: string) => void;
 }
 
 export const NoteList = React.memo(function NoteList({
     notes,
+    allNotes,
     activeNoteId,
     searchQuery,
     onSearchChange,
@@ -30,8 +41,23 @@ export const NoteList = React.memo(function NoteList({
     onExportAll,
     onExportPdf,
     onImport,
+    onMoveNoteToFolder,
     themeSwitcher,
+    folders,
+    activeFolderId,
+    onSelectFolder,
+    onCreateFolder,
+    onRenameFolder,
+    onDeleteFolder,
 }: NoteListProps) {
+    // 计算各文件夹笔记数
+    const folderNoteCounts: Record<string, number> = {};
+    for (const note of allNotes) {
+        if (note.folderId) {
+            folderNoteCounts[note.folderId] = (folderNoteCounts[note.folderId] || 0) + 1;
+        }
+    }
+
     return (
         <aside
             className="w-72 min-w-[260px] flex flex-col h-full"
@@ -77,6 +103,18 @@ export const NoteList = React.memo(function NoteList({
                 </div>
             </div>
 
+            {/* 文件夹列表 */}
+            <FolderList
+                folders={folders}
+                activeFolderId={activeFolderId}
+                allNotesCount={allNotes.length}
+                folderNoteCounts={folderNoteCounts}
+                onSelectFolder={onSelectFolder}
+                onCreateFolder={onCreateFolder}
+                onRenameFolder={onRenameFolder}
+                onDeleteFolder={onDeleteFolder}
+            />
+
             {/* 搜索栏 */}
             <SearchBar value={searchQuery} onChange={onSearchChange} />
 
@@ -88,8 +126,10 @@ export const NoteList = React.memo(function NoteList({
                             key={note.id}
                             note={note}
                             isActive={note.id === activeNoteId}
+                            folders={folders}
                             onSelect={onSelectNote}
                             onDelete={onDeleteNote}
+                            onMoveToFolder={onMoveNoteToFolder}
                         />
                     ))
                 ) : (

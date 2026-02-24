@@ -1,7 +1,8 @@
-import type { Note } from '../types/note';
+import type { Note, Folder } from '../types/note';
 
 const STORAGE_KEY = 'markdown-notes-app';
 const IMAGE_STORAGE_KEY = 'markdown-notes-images';
+const FOLDER_STORAGE_KEY = 'markdown-notes-folders';
 
 export const storage = {
     getNotes(): Note[] {
@@ -19,6 +20,26 @@ export const storage = {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
         } catch {
             console.error('Failed to save notes to LocalStorage');
+        }
+    },
+};
+
+export const folderStorage = {
+    getFolders(): Folder[] {
+        try {
+            const data = localStorage.getItem(FOLDER_STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch {
+            console.error('Failed to parse folders from LocalStorage');
+            return [];
+        }
+    },
+
+    saveFolders(folders: Folder[]): void {
+        try {
+            localStorage.setItem(FOLDER_STORAGE_KEY, JSON.stringify(folders));
+        } catch {
+            console.error('Failed to save folders to LocalStorage');
         }
     },
 };
@@ -64,4 +85,3 @@ export const imageStorage = {
         });
     },
 };
-
