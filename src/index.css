@@ -1,0 +1,278 @@
+@import "tailwindcss";
+
+/* ===== 全局基础样式 ===== */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #0d0f16;
+    color: #e2e8f0;
+  }
+}
+
+/* ===== 自定义滚动条 ===== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== Markdown 预览样式 ===== */
+.markdown-preview {
+  color: #c9d1d9;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.markdown-preview h1 {
+  font-size: 2em;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+  color: #e6edf3;
+  letter-spacing: -0.02em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4em;
+}
+
+.markdown-preview h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: #e6edf3;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.3em;
+}
+
+.markdown-preview h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin-top: 1.3em;
+  margin-bottom: 0.4em;
+  color: #e6edf3;
+}
+
+.markdown-preview h4 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+  color: #e6edf3;
+}
+
+.markdown-preview h5,
+.markdown-preview h6 {
+  font-size: 1em;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+  color: #cbd5e1;
+}
+
+.markdown-preview p {
+  margin-bottom: 1em;
+}
+
+/* ===== 无序列表 ===== */
+.markdown-preview ul {
+  margin-bottom: 1em;
+  padding-left: 0;
+  list-style: none;
+}
+
+.markdown-preview ul>li {
+  position: relative;
+  padding-left: 1.5em;
+  margin-bottom: 0.4em;
+}
+
+.markdown-preview ul>li::before {
+  content: '';
+  position: absolute;
+  left: 0.35em;
+  top: 0.65em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* 嵌套无序列表：空心圆 */
+.markdown-preview ul ul>li::before {
+  background: transparent;
+  border: 1.5px solid rgba(99, 102, 241, 0.4);
+}
+
+/* 三级嵌套：小方块 */
+.markdown-preview ul ul ul>li::before {
+  border-radius: 1px;
+  width: 5px;
+  height: 5px;
+  background: rgba(99, 102, 241, 0.3);
+}
+
+/* ===== 有序列表 ===== */
+.markdown-preview ol {
+  margin-bottom: 1em;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: md-ol-counter;
+}
+
+.markdown-preview ol>li {
+  position: relative;
+  padding-left: 2em;
+  margin-bottom: 0.4em;
+  counter-increment: md-ol-counter;
+}
+
+.markdown-preview ol>li::before {
+  content: counter(md-ol-counter) '.';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: rgba(99, 102, 241, 0.7);
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5em;
+  text-align: right;
+}
+
+/* 嵌套有序列表 */
+.markdown-preview ol ol {
+  counter-reset: md-ol-counter-nested;
+}
+
+.markdown-preview ol ol>li {
+  counter-increment: md-ol-counter-nested;
+}
+
+.markdown-preview ol ol>li::before {
+  content: counter(md-ol-counter-nested) '.';
+  color: rgba(99, 102, 241, 0.5);
+}
+
+/* ===== 列表嵌套通用 ===== */
+.markdown-preview li>ul,
+.markdown-preview li>ol {
+  margin-top: 0.35em;
+  margin-bottom: 0;
+}
+
+/* ===== 任务列表 ===== */
+.markdown-preview li:has(> input[type="checkbox"]) {
+  list-style: none;
+  padding-left: 0.2em;
+}
+
+.markdown-preview li:has(> input[type="checkbox"])::before {
+  display: none;
+}
+
+.markdown-preview input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(99, 102, 241, 0.35);
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.05);
+  vertical-align: text-bottom;
+  margin-right: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.markdown-preview input[type="checkbox"]:hover {
+  border-color: rgba(99, 102, 241, 0.6);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.markdown-preview input[type="checkbox"]:checked {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.6);
+}
+
+.markdown-preview input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  font-size: 12px;
+  color: #818cf8;
+  font-weight: bold;
+}
+
+/* 已完成任务文本变淡 */
+.markdown-preview li:has(> input[type="checkbox"]:checked) {
+  color: #6b7280;
+  text-decoration: line-through;
+  text-decoration-color: rgba(107, 114, 128, 0.4);
+}
+
+.markdown-preview img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 1em 0;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.markdown-preview strong {
+  color: #e6edf3;
+  font-weight: 600;
+}
+
+.markdown-preview em {
+  color: #a5b4c8;
+}
+
+.markdown-preview del {
+  color: #6b7280;
+}
+
+/* 确保第一个标题没有顶部边距 */
+.markdown-preview>h1:first-child,
+.markdown-preview>h2:first-child,
+.markdown-preview>h3:first-child {
+  margin-top: 0;
+}
+
+/* ===== 动画 ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.markdown-preview>* {
+  animation: fadeIn 0.2s ease-out;
+}
