@@ -58,12 +58,10 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
             const match = /language-(\w+)/.exec(className || '');
             const codeString = String(children).replace(/\n$/, '');
 
-            // 多行代码块（有语言声明）
             if (match) {
                 return <CodeBlock language={match[1]}>{codeString}</CodeBlock>;
             }
 
-            // 多行代码块（无语言声明，通过是否包含换行判断）
             if (codeString.includes('\n')) {
                 return <CodeBlock language="text">{codeString}</CodeBlock>;
             }
@@ -71,65 +69,78 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
             // 行内代码
             return (
                 <code
-                    className="px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 text-[0.85em] font-mono"
+                    className="px-1.5 py-0.5 rounded-md text-[0.85em] font-mono"
+                    style={{
+                        backgroundColor: 'var(--preview-code-bg)',
+                        color: 'var(--accent-hover)',
+                    }}
                     {...props}
                 >
                     {children}
                 </code>
             );
         },
-        // 块级代码
         pre({ children }) {
             return <div>{children}</div>;
         },
-        // 表格
         table({ children, ...props }) {
             return (
-                <div className="overflow-x-auto my-4 rounded-xl border border-white/10">
+                <div className="overflow-x-auto my-4 rounded-xl" style={{ border: '1px solid var(--preview-table-border)' }}>
                     <table className="w-full text-sm" {...props}>{children}</table>
                 </div>
             );
         },
         thead({ children, ...props }) {
-            return <thead className="bg-white/5 text-slate-300" {...props}>{children}</thead>;
+            return (
+                <thead style={{ backgroundColor: 'var(--preview-table-header-bg)', color: 'var(--text-primary)' }} {...props}>
+                    {children}
+                </thead>
+            );
         },
         th({ children, ...props }) {
             return (
-                <th className="px-4 py-2.5 text-left font-semibold tracking-wide border-b border-white/10" {...props}>
+                <th className="px-4 py-2.5 text-left font-semibold tracking-wide" style={{ borderBottom: '1px solid var(--preview-table-border)' }} {...props}>
                     {children}
                 </th>
             );
         },
         td({ children, ...props }) {
             return (
-                <td className="px-4 py-2.5 border-b border-white/5 text-slate-400" {...props}>
+                <td className="px-4 py-2.5" style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }} {...props}>
                     {children}
                 </td>
             );
         },
-        // 引用块
         blockquote({ children, ...props }) {
             return (
                 <blockquote
-                    className="border-l-4 border-indigo-500/30 pl-4 my-4 text-slate-400 italic bg-indigo-500/5 py-3 pr-4 rounded-r-lg"
+                    className="pl-4 my-4 italic py-3 pr-4 rounded-r-lg"
+                    style={{
+                        borderLeft: '4px solid var(--preview-blockquote-border)',
+                        backgroundColor: 'var(--preview-blockquote-bg)',
+                        color: 'var(--text-secondary)',
+                    }}
                     {...props}
                 >
                     {children}
                 </blockquote>
             );
         },
-        // 水平线
         hr({ ...props }) {
             return (
-                <hr className="my-8 border-none h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" {...props} />
+                <hr
+                    className="my-8 border-none h-px"
+                    style={{ background: `linear-gradient(to right, transparent, var(--accent-muted), transparent)` }}
+                    {...props}
+                />
             );
         },
-        // 链接
         a({ children, href, ...props }) {
             return (
                 <a
                     href={href}
-                    className="text-indigo-400 hover:text-indigo-300 underline decoration-indigo-500/30 hover:decoration-indigo-400/50 transition-colors"
+                    className="underline transition-colors"
+                    style={{ color: 'var(--preview-link-color)' }}
                     target="_blank"
                     rel="noopener noreferrer"
                     {...props}
@@ -138,19 +149,18 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
                 </a>
             );
         },
-        // 自定义图片渲染
         img({ src, alt, ...props }) {
             return (
                 <img
                     src={src}
                     alt={alt || ''}
-                    className="max-w-full rounded-xl my-4 border border-white/5"
+                    className="max-w-full rounded-xl my-4"
+                    style={{ border: '1px solid var(--border-color)' }}
                     loading="lazy"
                     {...props}
                 />
             );
         },
-        // 自定义标题渲染：添加 ID 供目录导航跳转
         h1({ children, ...props }) {
             return <h1 id={getHeadingId(children)} {...props}>{children}</h1>;
         },
@@ -169,18 +179,17 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
         h6({ children, ...props }) {
             return <h6 id={getHeadingId(children)} {...props}>{children}</h6>;
         },
-        // 自定义高亮渲染：==文字== 语法，绿色显示
         mark({ children, ...props }) {
             return (
                 <mark
-                    className="bg-emerald-500/15 text-emerald-400 px-1 rounded-sm"
+                    className="px-1 rounded-sm"
+                    style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}
                     {...props}
                 >
                     {children}
                 </mark>
             );
         },
-        // 任务列表 li：用 AST 节点位置信息打上源码行号
         li({ node, children, className, ...props }: any) {
             if (className === 'task-list-item' && node?.position) {
                 const sourceLine = node.position.start.line - 1;
@@ -192,7 +201,6 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
             }
             return <li className={className} {...props}>{children}</li>;
         },
-        // 任务列表复选框：从父 li 读取行号，点击时切换
         input(props: any) {
             if (props.type === 'checkbox') {
                 return (
@@ -223,17 +231,20 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
 
     if (!content && !title) {
         return (
-            <div className="flex-1 flex items-center justify-center bg-[#0d0f16]">
-                <p className="text-slate-600 text-sm">预览区域</p>
+            <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-primary)' }}>
+                <p className="text-sm" style={{ color: 'var(--text-placeholder)' }}>预览区域</p>
             </div>
         );
     }
 
     return (
-        <div className="flex-1 overflow-y-auto bg-[#0d0f16] custom-scrollbar">
+        <div className="flex-1 overflow-y-auto custom-scrollbar" style={{ backgroundColor: 'var(--bg-primary)' }}>
             <article className="max-w-none px-8 py-6 markdown-preview">
                 {title && (
-                    <h1 className="text-3xl font-bold text-slate-100 mb-6 pb-4 border-b border-white/10 tracking-tight">
+                    <h1
+                        className="text-3xl font-bold mb-6 pb-4 tracking-tight"
+                        style={{ color: 'var(--preview-heading)', borderBottom: '1px solid var(--border-color)' }}
+                    >
                         {title}
                     </h1>
                 )}

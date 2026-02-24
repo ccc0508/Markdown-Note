@@ -1,8 +1,10 @@
 import { useNotes } from './hooks/useNotes';
+import { useTheme } from './hooks/useTheme';
 import { NoteList } from './components/NoteList/NoteList';
 import { Editor } from './components/Editor/Editor';
 import { Preview } from './components/Preview/Preview';
 import { TableOfContents } from './components/Preview/TableOfContents';
+import { ThemeSwitcher } from './components/ThemeSwitcher/ThemeSwitcher';
 
 function App() {
   const {
@@ -21,9 +23,14 @@ function App() {
     importNotes,
   } = useNotes();
 
+  const { currentTheme, themes, setTheme } = useTheme();
+
   return (
-    <div className="flex h-screen w-screen bg-[#0d0f16] text-slate-200 overflow-hidden">
-      {/* 左侧：笔记列表 */}
+    <div
+      className="flex h-screen w-screen overflow-hidden"
+      style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+    >
+      {/* 左侧：笔记列表 + 主题切换 */}
       <NoteList
         notes={notes}
         activeNoteId={activeNoteId}
@@ -36,13 +43,20 @@ function App() {
         onExportAll={exportAllNotes}
         onExportPdf={exportPdf}
         onImport={importNotes}
+        themeSwitcher={
+          <ThemeSwitcher
+            currentTheme={currentTheme}
+            themes={themes}
+            onThemeChange={setTheme}
+          />
+        }
       />
 
       {/* 中间：编辑器 */}
       <Editor note={activeNote} onUpdateNote={updateNote} />
 
       {/* 分隔线 */}
-      <div className="w-px bg-white/10 flex-shrink-0" />
+      <div className="w-px flex-shrink-0" style={{ backgroundColor: 'var(--border-color)' }} />
 
       {/* 右侧：预览 + 目录 */}
       <Preview
@@ -64,4 +78,3 @@ function App() {
 }
 
 export default App;
-

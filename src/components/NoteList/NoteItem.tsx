@@ -36,7 +36,6 @@ export const NoteItem = React.memo(function NoteItem({
         }
     };
 
-    // 获取内容摘要（前 60 个字符）
     const summary = note.content
         .replace(/[#*`~\[\]>!|-]/g, '')
         .trim()
@@ -46,23 +45,35 @@ export const NoteItem = React.memo(function NoteItem({
         <div
             id={`note-item-${note.id}`}
             onClick={() => onSelect(note.id)}
-            className={`group px-4 py-3 cursor-pointer border-b border-white/5 transition-all duration-200 ${isActive
-                    ? 'bg-indigo-500/15 border-l-2 border-l-indigo-400'
-                    : 'hover:bg-white/5 border-l-2 border-l-transparent'
-                }`}
+            className="group px-4 py-3 cursor-pointer transition-all duration-200"
+            style={{
+                borderBottom: '1px solid var(--border-color)',
+                borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
+                backgroundColor: isActive ? 'var(--active-bg)' : 'transparent',
+            }}
+            onMouseEnter={(e) => {
+                if (!isActive) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--hover-bg)';
+                }
+            }}
+            onMouseLeave={(e) => {
+                if (!isActive) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                }
+            }}
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                     <h3
-                        className={`text-sm font-medium truncate ${isActive ? 'text-indigo-300' : 'text-slate-200'
-                            }`}
+                        className="text-sm font-medium truncate"
+                        style={{ color: isActive ? 'var(--accent-hover)' : 'var(--text-primary)' }}
                     >
                         {note.title || '未命名笔记'}
                     </h3>
                     {summary && (
-                        <p className="text-xs text-slate-500 mt-1 truncate">{summary}</p>
+                        <p className="text-xs mt-1 truncate" style={{ color: 'var(--text-muted)' }}>{summary}</p>
                     )}
-                    <p className="text-xs text-slate-600 mt-1">
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-placeholder)' }}>
                         {formatTime(note.updatedAt)}
                     </p>
                 </div>

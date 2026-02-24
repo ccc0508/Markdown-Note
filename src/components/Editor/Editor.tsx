@@ -18,10 +18,8 @@ export const Editor = React.memo(function Editor({
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const titleInputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    // 跟踪用户本地编辑的内容，用于区分外部更新
     const lastLocalContentRef = useRef('');
 
-    // 当选中笔记变化时同步本地状态
     useEffect(() => {
         if (note) {
             setTitle(note.title);
@@ -34,7 +32,6 @@ export const Editor = React.memo(function Editor({
         }
     }, [note?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // 检测外部内容更新（例如预览面板的复选框切换）
     useEffect(() => {
         if (note && note.content !== lastLocalContentRef.current) {
             setContent(note.content);
@@ -42,7 +39,6 @@ export const Editor = React.memo(function Editor({
         }
     }, [note?.content]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // 防抖保存
     const debouncedTitle = useDebounce(title, 400);
     const debouncedContent = useDebounce(content, 400);
 
@@ -53,18 +49,14 @@ export const Editor = React.memo(function Editor({
         }
     }, [debouncedTitle, debouncedContent]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // 将图片文件存为短 ID 引用并插入到光标位置
     const insertImageAtCursor = useCallback((file: File) => {
         if (!file.type.startsWith('image/')) return;
-
         const reader = new FileReader();
         reader.onload = () => {
             const base64 = reader.result as string;
-            // 图片存到独立存储，返回短 ID
             const imageId = imageStorage.save(base64);
             const altText = file.name.replace(/\.[^.]+$/, '');
             const markdownImage = `![${altText}](img:${imageId})`;
-
             const textarea = textareaRef.current;
             if (textarea) {
                 const start = textarea.selectionStart;
@@ -87,13 +79,11 @@ export const Editor = React.memo(function Editor({
         reader.readAsDataURL(file);
     }, [content]);
 
-    // 处理多个图片文件
     const handleImageFiles = useCallback((files: FileList | File[]) => {
         const imageFiles = Array.from(files).filter((f) => f.type.startsWith('image/'));
         imageFiles.forEach((file) => insertImageAtCursor(file));
     }, [insertImageAtCursor]);
 
-    // 按钮点击上传
     const handleUploadClick = useCallback(() => {
         fileInputRef.current?.click();
     }, []);
@@ -101,15 +91,13 @@ export const Editor = React.memo(function Editor({
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             handleImageFiles(e.target.files);
-            e.target.value = ''; // 允许再次选择同一文件
+            e.target.value = '';
         }
     }, [handleImageFiles]);
 
-    // 粘贴支持：Ctrl+V 粘贴剪贴板中的图片
     const handlePaste = useCallback((e: React.ClipboardEvent<HTMLTextAreaElement>) => {
         const items = e.clipboardData?.items;
         if (!items) return;
-
         for (const item of Array.from(items)) {
             if (item.type.startsWith('image/')) {
                 e.preventDefault();
@@ -120,7 +108,6 @@ export const Editor = React.memo(function Editor({
         }
     }, [insertImageAtCursor]);
 
-    // 拖放支持
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -142,7 +129,6 @@ export const Editor = React.memo(function Editor({
         }
     }, [handleImageFiles]);
 
-    // Tab 缩进支持
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Tab') {
             e.preventDefault();
@@ -160,22 +146,22 @@ export const Editor = React.memo(function Editor({
 
     if (!note) {
         return (
-            <div className="flex-1 flex flex-col items-center justify-center bg-[#12141c]">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center mb-6">
-                    <svg className="w-12 h-12 text-indigo-400/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-1 flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--editor-bg)' }}>
+                <div className="w-24 h-24 rounded-2xl flex items-center justify-center mb-6" style={{ background: 'linear-gradient(135deg, var(--accent-bg), var(--active-bg))' }}>
+                    <svg className="w-12 h-12" style={{ color: 'var(--accent-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                 </div>
-                <p className="text-slate-500 text-lg font-medium">选择或创建一篇笔记</p>
-                <p className="text-slate-600 text-sm mt-2">开始你的 Markdown 写作之旅 ✨</p>
+                <p className="text-lg font-medium" style={{ color: 'var(--text-muted)' }}>选择或创建一篇笔记</p>
+                <p className="text-sm mt-2" style={{ color: 'var(--text-placeholder)' }}>开始你的 Markdown 写作之旅 ✨</p>
             </div>
         );
     }
 
     return (
-        <div className="flex-1 flex flex-col bg-[#12141c] min-w-0">
+        <div className="flex-1 flex flex-col min-w-0" style={{ backgroundColor: 'var(--editor-bg)' }}>
             {/* 标题输入 */}
-            <div className="px-6 pt-5 pb-3 border-b border-white/5">
+            <div className="px-6 pt-5 pb-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <input
                     id="note-title-input"
                     ref={titleInputRef}
@@ -183,16 +169,26 @@ export const Editor = React.memo(function Editor({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="笔记标题..."
-                    className="w-full bg-transparent text-2xl font-bold text-slate-100 placeholder-slate-600 focus:outline-none tracking-tight"
+                    className="w-full bg-transparent text-2xl font-bold focus:outline-none tracking-tight"
+                    style={{ color: 'var(--text-primary)', }}
                 />
             </div>
 
             {/* 工具栏 */}
-            <div className="px-6 py-2 border-b border-white/5 flex items-center gap-1">
+            <div className="px-6 py-2 flex items-center gap-1" style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <button
                     id="upload-image-btn"
                     onClick={handleUploadClick}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-200"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs transition-all duration-200"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = '#34d399';
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(52, 211, 153, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                    }}
                     title="上传图片（也可粘贴或拖放图片）"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +196,7 @@ export const Editor = React.memo(function Editor({
                     </svg>
                     插入图片
                 </button>
-                <span className="text-xs text-slate-700 ml-2">支持粘贴 / 拖放图片</span>
+                <span className="text-xs ml-2" style={{ color: 'var(--text-placeholder)' }}>支持粘贴 / 拖放图片</span>
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -214,18 +210,19 @@ export const Editor = React.memo(function Editor({
 
             {/* 内容编辑器 */}
             <div
-                className={`flex-1 relative transition-colors duration-200 ${isDragOver ? 'bg-indigo-500/5 ring-2 ring-inset ring-indigo-500/30 rounded-lg m-1' : ''}`}
+                className={`flex-1 relative transition-colors duration-200 ${isDragOver ? 'ring-2 ring-inset rounded-lg m-1' : ''}`}
+                style={isDragOver ? { backgroundColor: 'var(--accent-bg)', borderColor: 'var(--accent)' } : {}}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
                 {isDragOver && (
                     <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                        <div className="flex flex-col items-center gap-2 bg-[#12141c]/90 px-8 py-6 rounded-2xl border border-indigo-500/30">
-                            <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex flex-col items-center gap-2 px-8 py-6 rounded-2xl" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--accent-muted)' }}>
+                            <svg className="w-10 h-10" style={{ color: 'var(--accent)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <p className="text-indigo-300 text-sm font-medium">释放以插入图片</p>
+                            <p className="text-sm font-medium" style={{ color: 'var(--accent)' }}>释放以插入图片</p>
                         </div>
                     </div>
                 )}
@@ -239,12 +236,12 @@ export const Editor = React.memo(function Editor({
                     }}
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
-                    placeholder="开始编写 Markdown 内容...&#10;&#10;支持标题、列表、代码块、表格等语法&#10;可直接粘贴或拖放图片到此处"
-                    className="absolute inset-0 w-full h-full px-6 py-4 bg-transparent text-slate-300 placeholder-slate-700 resize-none focus:outline-none font-mono text-sm leading-7 custom-scrollbar"
+                    placeholder={"开始编写 Markdown 内容...\n\n支持标题、列表、代码块、表格等语法\n可直接粘贴或拖放图片到此处"}
+                    className="absolute inset-0 w-full h-full px-6 py-4 bg-transparent resize-none focus:outline-none font-mono text-sm leading-7 custom-scrollbar"
+                    style={{ color: 'var(--editor-text)' }}
                     spellCheck={false}
                 />
             </div>
         </div>
     );
 });
-

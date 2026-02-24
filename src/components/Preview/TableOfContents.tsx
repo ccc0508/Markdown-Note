@@ -17,8 +17,7 @@ function extractHeadings(content: string): TocItem[] {
     let inCodeBlock = false;
 
     for (const rawLine of lines) {
-        const line = rawLine.trimEnd(); // 处理 \r\n 换行符
-        // 跳过代码块内的 # 号
+        const line = rawLine.trimEnd();
         if (line.trimStart().startsWith('```')) {
             inCodeBlock = !inCodeBlock;
             continue;
@@ -56,23 +55,40 @@ export const TableOfContents = React.memo(function TableOfContents({
         return null;
     }
 
-    // 计算最小层级用于缩进归一化
     const minLevel = Math.min(...headings.map((h) => h.level));
 
     return (
-        <div className="w-56 min-w-[200px] bg-[#0a0c12] border-l border-white/10 flex flex-col h-full">
+        <div
+            className="w-56 min-w-[200px] flex flex-col h-full"
+            style={{
+                backgroundColor: 'var(--bg-toc-sidebar)',
+                borderLeft: '1px solid var(--border-color)',
+            }}
+        >
             {/* 标题栏 */}
-            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+            <div
+                className="px-4 py-3 flex items-center justify-between"
+                style={{ borderBottom: '1px solid var(--border-color)' }}
+            >
                 <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
-                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">目录</span>
+                    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>目录</span>
                 </div>
                 <button
                     id="toggle-toc-btn"
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="p-1 rounded text-slate-600 hover:text-slate-400 hover:bg-white/5 transition-colors"
+                    className="p-1 rounded transition-colors"
+                    style={{ color: 'var(--text-placeholder)' }}
+                    onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)';
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--hover-bg)';
+                    }}
+                    onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = 'var(--text-placeholder)';
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                    }}
                     title={isCollapsed ? '展开目录' : '收起目录'}
                 >
                     <svg
@@ -93,15 +109,22 @@ export const TableOfContents = React.memo(function TableOfContents({
                             <button
                                 key={`${heading.id}-${index}`}
                                 onClick={() => handleClick(heading.id)}
-                                className="w-full text-left px-4 py-1.5 text-xs hover:bg-white/5 transition-colors duration-150 group"
+                                className="w-full text-left px-4 py-1.5 text-xs transition-colors duration-150 group"
                                 style={{ paddingLeft: `${16 + indent}px` }}
                                 title={heading.text}
+                                onMouseEnter={(e) => {
+                                    (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--hover-bg)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                                }}
                             >
                                 <span
-                                    className={`block truncate transition-colors duration-150 ${heading.level <= 2
-                                        ? 'text-slate-400 group-hover:text-indigo-400 font-medium'
-                                        : 'text-slate-600 group-hover:text-slate-400'
-                                        }`}
+                                    className="block truncate transition-colors duration-150"
+                                    style={{
+                                        color: heading.level <= 2 ? 'var(--text-secondary)' : 'var(--text-muted)',
+                                        fontWeight: heading.level <= 2 ? 500 : 400,
+                                    }}
                                 >
                                     {heading.text}
                                 </span>

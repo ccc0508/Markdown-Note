@@ -15,6 +15,7 @@ interface NoteListProps {
     onExportAll: () => void;
     onExportPdf: () => void;
     onImport: () => void;
+    themeSwitcher?: React.ReactNode;
 }
 
 export const NoteList = React.memo(function NoteList({
@@ -29,29 +30,51 @@ export const NoteList = React.memo(function NoteList({
     onExportAll,
     onExportPdf,
     onImport,
+    themeSwitcher,
 }: NoteListProps) {
     return (
-        <aside className="w-72 min-w-[260px] bg-[#0f1117] border-r border-white/10 flex flex-col h-full">
-            {/* 头部：Logo + 新建按钮 */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+        <aside
+            className="w-72 min-w-[260px] flex flex-col h-full"
+            style={{
+                backgroundColor: 'var(--bg-sidebar)',
+                borderRight: '1px solid var(--border-color)',
+            }}
+        >
+            {/* 头部：Logo + 主题 + 新建按钮 */}
+            <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))' }}>
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                     </div>
-                    <h1 className="text-sm font-semibold text-slate-200 tracking-wide">Markdown Notes</h1>
+                    <h1 className="text-sm font-semibold tracking-wide" style={{ color: 'var(--text-primary)' }}>Markdown Notes</h1>
                 </div>
-                <button
-                    id="create-note-btn"
-                    onClick={onCreateNote}
-                    className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 hover:text-indigo-300 transition-all duration-200"
-                    title="新建笔记"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                </button>
+                <div className="flex items-center gap-1">
+                    {themeSwitcher}
+                    <button
+                        id="create-note-btn"
+                        onClick={onCreateNote}
+                        className="p-1.5 rounded-lg transition-all duration-200"
+                        style={{
+                            backgroundColor: 'var(--accent-bg)',
+                            color: 'var(--accent)',
+                        }}
+                        onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--active-bg)';
+                            (e.currentTarget as HTMLElement).style.color = 'var(--accent-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--accent-bg)';
+                            (e.currentTarget as HTMLElement).style.color = 'var(--accent)';
+                        }}
+                        title="新建笔记"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             {/* 搜索栏 */}
@@ -71,16 +94,16 @@ export const NoteList = React.memo(function NoteList({
                     ))
                 ) : (
                     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                            <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'var(--hover-bg)' }}>
+                            <svg className="w-8 h-8" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                             {searchQuery ? '暂无匹配笔记' : '暂无笔记'}
                         </p>
                         {!searchQuery && (
-                            <p className="text-xs text-slate-600 mt-1">
+                            <p className="text-xs mt-1" style={{ color: 'var(--text-placeholder)' }}>
                                 点击上方 + 创建第一篇笔记
                             </p>
                         )}
@@ -89,13 +112,22 @@ export const NoteList = React.memo(function NoteList({
             </div>
 
             {/* 底部操作栏 */}
-            <div className="p-2 border-t border-white/10 flex items-center justify-between">
+            <div className="p-2 flex items-center justify-between" style={{ borderTop: '1px solid var(--border-color)' }}>
                 <div className="flex items-center gap-1">
                     {/* 导入 */}
                     <button
                         id="import-notes-btn"
                         onClick={onImport}
-                        className="p-1.5 rounded-md text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-200"
+                        className="p-1.5 rounded-md transition-all duration-200"
+                        style={{ color: 'var(--text-muted)' }}
+                        onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = '#34d399';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(52, 211, 153, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                        }}
                         title="导入笔记 (.md / .json)"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +138,16 @@ export const NoteList = React.memo(function NoteList({
                     <button
                         id="export-current-btn"
                         onClick={onExportCurrent}
-                        className="p-1.5 rounded-md text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all duration-200"
+                        className="p-1.5 rounded-md transition-all duration-200"
+                        style={{ color: 'var(--text-muted)' }}
+                        onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = 'var(--accent)';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--accent-bg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                        }}
                         title="导出当前笔记 (.md)"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +158,16 @@ export const NoteList = React.memo(function NoteList({
                     <button
                         id="export-all-btn"
                         onClick={onExportAll}
-                        className="p-1.5 rounded-md text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200"
+                        className="p-1.5 rounded-md transition-all duration-200"
+                        style={{ color: 'var(--text-muted)' }}
+                        onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = '#fbbf24';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(251, 191, 36, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                        }}
                         title="导出全部笔记 (.json)"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +178,16 @@ export const NoteList = React.memo(function NoteList({
                     <button
                         id="export-pdf-btn"
                         onClick={onExportPdf}
-                        className="p-1.5 rounded-md text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200"
+                        className="p-1.5 rounded-md transition-all duration-200"
+                        style={{ color: 'var(--text-muted)' }}
+                        onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = '#fb7185';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(251, 113, 133, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                            (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                        }}
                         title="导出为 PDF"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +195,7 @@ export const NoteList = React.memo(function NoteList({
                         </svg>
                     </button>
                 </div>
-                <span className="text-xs text-slate-600">{notes.length} 篇笔记</span>
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{notes.length} 篇笔记</span>
             </div>
         </aside>
     );

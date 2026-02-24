@@ -1,5 +1,45 @@
 @import "tailwindcss";
 
+/* ===== CSS 变量默认值（由 JS 动态覆盖） ===== */
+:root {
+  --bg-primary: #0d0f16;
+  --bg-secondary: #12141c;
+  --bg-tertiary: #181b25;
+  --bg-sidebar: #0f1117;
+  --bg-toc-sidebar: #0a0c12;
+  --border-color: rgba(255, 255, 255, 0.1);
+
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-placeholder: #334155;
+  --text-heading: #e6edf3;
+
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-muted: rgba(99, 102, 241, 0.5);
+  --accent-bg: rgba(99, 102, 241, 0.1);
+
+  --editor-bg: #12141c;
+  --editor-text: #cbd5e1;
+
+  --preview-text: #c9d1d9;
+  --preview-heading: #e6edf3;
+  --preview-code-bg: rgba(99, 102, 241, 0.08);
+  --preview-code-border: rgba(99, 102, 241, 0.15);
+  --preview-blockquote-bg: rgba(99, 102, 241, 0.05);
+  --preview-blockquote-border: rgba(99, 102, 241, 0.4);
+  --preview-table-border: rgba(255, 255, 255, 0.1);
+  --preview-table-header-bg: rgba(255, 255, 255, 0.03);
+  --preview-link-color: #818cf8;
+
+  --scrollbar-thumb: rgba(255, 255, 255, 0.08);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.15);
+
+  --hover-bg: rgba(255, 255, 255, 0.05);
+  --active-bg: rgba(99, 102, 241, 0.1);
+}
+
 /* ===== 全局基础样式 ===== */
 @layer base {
   * {
@@ -13,8 +53,9 @@
       'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #0d0f16;
-    color: #e2e8f0;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -29,17 +70,17 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* ===== Markdown 预览样式 ===== */
 .markdown-preview {
-  color: #c9d1d9;
+  color: var(--preview-text);
   line-height: 1.8;
   font-size: 15px;
 }
@@ -49,9 +90,9 @@
   font-weight: 700;
   margin-top: 1.5em;
   margin-bottom: 0.6em;
-  color: #e6edf3;
+  color: var(--preview-heading);
   letter-spacing: -0.02em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.4em;
 }
 
@@ -60,9 +101,9 @@
   font-weight: 600;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
-  color: #e6edf3;
+  color: var(--preview-heading);
   letter-spacing: -0.01em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3em;
 }
 
@@ -71,7 +112,7 @@
   font-weight: 600;
   margin-top: 1.3em;
   margin-bottom: 0.4em;
-  color: #e6edf3;
+  color: var(--preview-heading);
 }
 
 .markdown-preview h4 {
@@ -79,7 +120,7 @@
   font-weight: 600;
   margin-top: 1.2em;
   margin-bottom: 0.4em;
-  color: #e6edf3;
+  color: var(--preview-heading);
 }
 
 .markdown-preview h5,
@@ -88,7 +129,7 @@
   font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.3em;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .markdown-preview p {
@@ -116,13 +157,13 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.5);
+  background: var(--accent-muted);
 }
 
 /* 嵌套无序列表：空心圆 */
 .markdown-preview ul ul>li::before {
   background: transparent;
-  border: 1.5px solid rgba(99, 102, 241, 0.4);
+  border: 1.5px solid var(--accent-muted);
 }
 
 /* 三级嵌套：小方块 */
@@ -130,7 +171,7 @@
   border-radius: 1px;
   width: 5px;
   height: 5px;
-  background: rgba(99, 102, 241, 0.3);
+  background: var(--accent-bg);
 }
 
 /* ===== 有序列表 ===== */
@@ -155,7 +196,7 @@
   top: 0;
   font-size: 0.85em;
   font-weight: 600;
-  color: rgba(99, 102, 241, 0.7);
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
   min-width: 1.5em;
   text-align: right;
@@ -172,7 +213,7 @@
 
 .markdown-preview ol ol>li::before {
   content: counter(md-ol-counter-nested) '.';
-  color: rgba(99, 102, 241, 0.5);
+  color: var(--accent-muted);
 }
 
 /* ===== 列表嵌套通用 ===== */
@@ -196,9 +237,9 @@
   appearance: none;
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(99, 102, 241, 0.35);
+  border: 2px solid var(--accent-muted);
   border-radius: 4px;
-  background: rgba(99, 102, 241, 0.05);
+  background: var(--accent-bg);
   vertical-align: text-bottom;
   margin-right: 8px;
   cursor: pointer;
@@ -207,13 +248,13 @@
 }
 
 .markdown-preview input[type="checkbox"]:hover {
-  border-color: rgba(99, 102, 241, 0.6);
-  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--accent);
+  background: var(--accent-bg);
 }
 
 .markdown-preview input[type="checkbox"]:checked {
-  background: rgba(99, 102, 241, 0.25);
-  border-color: rgba(99, 102, 241, 0.6);
+  background: var(--accent-bg);
+  border-color: var(--accent);
 }
 
 .markdown-preview input[type="checkbox"]:checked::after {
@@ -222,35 +263,35 @@
   top: -2px;
   left: 2px;
   font-size: 12px;
-  color: #818cf8;
+  color: var(--accent-hover);
   font-weight: bold;
 }
 
 /* 已完成任务文本变淡 */
 .markdown-preview li:has(> input[type="checkbox"]:checked) {
-  color: #6b7280;
+  color: var(--text-muted);
   text-decoration: line-through;
-  text-decoration-color: rgba(107, 114, 128, 0.4);
+  text-decoration-color: var(--text-muted);
 }
 
 .markdown-preview img {
   max-width: 100%;
   border-radius: 12px;
   margin: 1em 0;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
 }
 
 .markdown-preview strong {
-  color: #e6edf3;
+  color: var(--preview-heading);
   font-weight: 600;
 }
 
 .markdown-preview em {
-  color: #a5b4c8;
+  color: var(--text-secondary);
 }
 
 .markdown-preview del {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* 确保第一个标题没有顶部边距 */
@@ -258,6 +299,14 @@
 .markdown-preview>h2:first-child,
 .markdown-preview>h3:first-child {
   margin-top: 0;
+}
+
+/* ===== 主题过渡动画 ===== */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 /* ===== 动画 ===== */
