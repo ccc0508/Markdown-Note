@@ -117,78 +117,65 @@ export function useNotes() {
             return;
         }
 
-        // 克隆预览内容，以免修改原始 DOM
-        const clone = previewEl.cloneNode(true) as HTMLElement;
+        // 创建一个离屏容器，内含克隆的预览内容和打印友好样式
+        const wrapper = document.createElement('div');
 
-        // 应用打印友好样式
-        clone.style.cssText = `
-            background: white;
-            color: #1a1a2e;
-            padding: 40px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.8;
-            max-width: none;
+        // 注入 CSS 覆盖深色主题（通过样式表而非逐元素修改，避免卡死）
+        const style = document.createElement('style');
+        style.textContent = `
+            .pdf-export-root {
+                background: white !important;
+                color: #1a1a2e !important;
+                padding: 40px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                line-height: 1.8;
+            }
+            .pdf-export-root * {
+                color: #1a1a2e !important;
+                border-color: #ddd !important;
+            }
+            .pdf-export-root h1, .pdf-export-root h2, .pdf-export-root h3,
+            .pdf-export-root h4, .pdf-export-root h5, .pdf-export-root h6 {
+                color: #111 !important;
+            }
+            .pdf-export-root a { color: #4f46e5 !important; }
+            .pdf-export-root pre, .pdf-export-root code {
+                background-color: #f5f5f5 !important;
+                color: #333 !important;
+                border-radius: 6px;
+            }
+            .pdf-export-root pre {
+                padding: 12px 16px;
+                border: 1px solid #e0e0e0 !important;
+            }
+            .pdf-export-root table { border-collapse: collapse; width: 100%; }
+            .pdf-export-root th, .pdf-export-root td {
+                border: 1px solid #ddd !important;
+                padding: 8px 12px;
+                color: #333 !important;
+            }
+            .pdf-export-root th { background-color: #f0f0f0 !important; }
+            .pdf-export-root blockquote {
+                border-left: 4px solid #6366f1 !important;
+                background-color: #f8f8ff !important;
+                color: #555 !important;
+                padding: 12px 16px;
+            }
+            .pdf-export-root blockquote * { color: #555 !important; }
+            .pdf-export-root mark {
+                background-color: #d1fae5 !important;
+                color: #065f46 !important;
+            }
+            .pdf-export-root img { max-width: 100%; }
+            .pdf-export-root ul > li::before {
+                background: #333 !important;
+            }
         `;
+        wrapper.appendChild(style);
 
-        // 调整子元素颜色
-        clone.querySelectorAll('*').forEach((el) => {
-            const htmlEl = el as HTMLElement;
-            const computed = window.getComputedStyle(el);
-            // 让浅色文字变深色
-            if (computed.color) {
-                const rgb = computed.color.match(/\d+/g);
-                if (rgb) {
-                    const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
-                    if (brightness > 150) {
-                        htmlEl.style.color = '#1a1a2e';
-                    }
-                }
-            }
-            // 移除深色背景
-            if (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-                const rgb = computed.backgroundColor.match(/\d+/g);
-                if (rgb) {
-                    const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
-                    if (brightness < 80) {
-                        htmlEl.style.backgroundColor = 'transparent';
-                    }
-                }
-            }
-        });
-
-        // 代码块样式
-        clone.querySelectorAll('pre, code').forEach((el) => {
-            const htmlEl = el as HTMLElement;
-            htmlEl.style.backgroundColor = '#f5f5f5';
-            htmlEl.style.color = '#333';
-            htmlEl.style.borderRadius = '6px';
-            if (el.tagName === 'PRE') {
-                htmlEl.style.padding = '12px 16px';
-                htmlEl.style.border = '1px solid #e0e0e0';
-            }
-        });
-
-        // 表格边框
-        clone.querySelectorAll('table').forEach((el) => {
-            (el as HTMLElement).style.borderCollapse = 'collapse';
-        });
-        clone.querySelectorAll('th, td').forEach((el) => {
-            const htmlEl = el as HTMLElement;
-            htmlEl.style.border = '1px solid #ddd';
-            htmlEl.style.padding = '8px 12px';
-            htmlEl.style.color = '#333';
-        });
-        clone.querySelectorAll('th').forEach((el) => {
-            (el as HTMLElement).style.backgroundColor = '#f0f0f0';
-        });
-
-        // 引用块
-        clone.querySelectorAll('blockquote').forEach((el) => {
-            const htmlEl = el as HTMLElement;
-            htmlEl.style.borderLeftColor = '#6366f1';
-            htmlEl.style.backgroundColor = '#f8f8ff';
-            htmlEl.style.color = '#555';
-        });
+        const clone = previewEl.cloneNode(true) as HTMLElement;
+        clone.className = 'pdf-export-root';
+        wrapper.appendChild(clone);
 
         const filename = `${note.title || '未命名笔记'}.pdf`;
 
@@ -210,7 +197,7 @@ export function useNotes() {
                 },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
             } as any)
-            .from(clone)
+            .from(wrapper)
             .save();
     }, [notes, activeNoteId]);
 
