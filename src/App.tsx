@@ -17,6 +17,7 @@ function App() {
     deleteNote,
     exportCurrentNote,
     exportAllNotes,
+    exportPdf,
     importNotes,
   } = useNotes();
 
@@ -33,6 +34,7 @@ function App() {
         onDeleteNote={deleteNote}
         onExportCurrent={exportCurrentNote}
         onExportAll={exportAllNotes}
+        onExportPdf={exportPdf}
         onImport={importNotes}
       />
 

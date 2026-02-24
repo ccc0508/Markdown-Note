@@ -13,6 +13,7 @@ interface NoteListProps {
     onDeleteNote: (id: string) => void;
     onExportCurrent: () => void;
     onExportAll: () => void;
+    onExportPdf: () => void;
     onImport: () => void;
 }
 
@@ -26,6 +27,7 @@ export const NoteList = React.memo(function NoteList({
     onDeleteNote,
     onExportCurrent,
     onExportAll,
+    onExportPdf,
     onImport,
 }: NoteListProps) {
     return (
@@ -120,6 +122,17 @@ export const NoteList = React.memo(function NoteList({
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                    </button>
+                    {/* 导出 PDF */}
+                    <button
+                        id="export-pdf-btn"
+                        onClick={onExportPdf}
+                        className="p-1.5 rounded-md text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200"
+                        title="导出为 PDF"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                     </button>
                 </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import html2pdf from 'html2pdf.js';
 import type { Note } from '../types/note';
 import { storage } from '../utils/storage';
 
@@ -103,6 +104,116 @@ export function useNotes() {
         downloadFile(filename, data, 'application/json;charset=utf-8');
     }, [notes, downloadFile]);
 
+    // 导出当前笔记为 PDF
+    const exportPdf = useCallback(() => {
+        if (!activeNoteId) return;
+        const note = notes.find((n) => n.id === activeNoteId);
+        if (!note) return;
+
+        // 查找预览面板的渲染内容
+        const previewEl = document.querySelector('.markdown-preview');
+        if (!previewEl) {
+            alert('请先打开预览面板');
+            return;
+        }
+
+        // 克隆预览内容，以免修改原始 DOM
+        const clone = previewEl.cloneNode(true) as HTMLElement;
+
+        // 应用打印友好样式
+        clone.style.cssText = `
+            background: white;
+            color: #1a1a2e;
+            padding: 40px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.8;
+            max-width: none;
+        `;
+
+        // 调整子元素颜色
+        clone.querySelectorAll('*').forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            const computed = window.getComputedStyle(el);
+            // 让浅色文字变深色
+            if (computed.color) {
+                const rgb = computed.color.match(/\d+/g);
+                if (rgb) {
+                    const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
+                    if (brightness > 150) {
+                        htmlEl.style.color = '#1a1a2e';
+                    }
+                }
+            }
+            // 移除深色背景
+            if (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                const rgb = computed.backgroundColor.match(/\d+/g);
+                if (rgb) {
+                    const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
+                    if (brightness < 80) {
+                        htmlEl.style.backgroundColor = 'transparent';
+                    }
+                }
+            }
+        });
+
+        // 代码块样式
+        clone.querySelectorAll('pre, code').forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.backgroundColor = '#f5f5f5';
+            htmlEl.style.color = '#333';
+            htmlEl.style.borderRadius = '6px';
+            if (el.tagName === 'PRE') {
+                htmlEl.style.padding = '12px 16px';
+                htmlEl.style.border = '1px solid #e0e0e0';
+            }
+        });
+
+        // 表格边框
+        clone.querySelectorAll('table').forEach((el) => {
+            (el as HTMLElement).style.borderCollapse = 'collapse';
+        });
+        clone.querySelectorAll('th, td').forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.border = '1px solid #ddd';
+            htmlEl.style.padding = '8px 12px';
+            htmlEl.style.color = '#333';
+        });
+        clone.querySelectorAll('th').forEach((el) => {
+            (el as HTMLElement).style.backgroundColor = '#f0f0f0';
+        });
+
+        // 引用块
+        clone.querySelectorAll('blockquote').forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.borderLeftColor = '#6366f1';
+            htmlEl.style.backgroundColor = '#f8f8ff';
+            htmlEl.style.color = '#555';
+        });
+
+        const filename = `${note.title || '未命名笔记'}.pdf`;
+
+        html2pdf()
+            .set({
+                margin: [15, 15, 15, 15],
+                filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+            } as any)
+            .from(clone)
+            .save();
+    }, [notes, activeNoteId]);
+
     // 导入笔记（支持 .md 和 .json）
     const importNotes = useCallback(() => {
         const input = document.createElement('input');
@@ -177,6 +288,7 @@ export function useNotes() {
         deleteNote,
         exportCurrentNote,
         exportAllNotes,
+        exportPdf,
         importNotes,
     };
 }
