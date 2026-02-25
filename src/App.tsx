@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useNotes } from './hooks/useNotes';
 import { useTheme } from './hooks/useTheme';
 import { useResizable } from './hooks/useResizable';
@@ -34,6 +35,8 @@ function App() {
 
   const { currentTheme, themes, setTheme } = useTheme();
 
+  const contentRef = useRef<HTMLDivElement>(null);
+
   // 可拖拽面板尺寸
   const sidebar = useResizable({
     initialSize: 288,
@@ -49,6 +52,7 @@ function App() {
     maxSize: 75,
     direction: 'right',
     storageKey: 'panel-preview-pct',
+    containerRef: contentRef,
   });
 
   return (
@@ -95,7 +99,7 @@ function App() {
       />
 
       {/* 中间+右侧 内容区域 */}
-      <div className="flex-1 flex min-w-0 overflow-hidden">
+      <div ref={contentRef} className="flex-1 flex min-w-0 overflow-hidden">
         {/* 编辑器 */}
         <div style={{ flex: `${100 - preview.size} 0 0%` }} className="min-w-0 overflow-hidden">
           <Editor note={activeNote} onUpdateNote={updateNote} />
