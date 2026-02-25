@@ -48,7 +48,7 @@ export function useResizable({
         isResizing.current = true;
         startX.current = e.clientX;
         startSize.current = size;
-        document.body.style.cursor = 'col-resize';
+        document.documentElement.classList.add('is-resizing');
         document.body.style.userSelect = 'none';
 
         // 记录容器宽度（用于像素→百分比转换）
@@ -69,7 +69,7 @@ export function useResizable({
 
         const handleMouseUp = () => {
             isResizing.current = false;
-            document.body.style.cursor = '';
+            document.documentElement.classList.remove('is-resizing');
             document.body.style.userSelect = '';
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);

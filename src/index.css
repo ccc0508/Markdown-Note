@@ -57,6 +57,14 @@
   background-color: var(--accent);
 }
 
+/* 拖拽中强制光标 */
+html.is-resizing,
+html.is-resizing * {
+  cursor: col-resize !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
 /* ===== 全局基础样式 ===== */
 @layer base {
   * {
