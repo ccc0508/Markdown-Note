@@ -101,7 +101,7 @@ function App() {
       {/* 中间+右侧 内容区域 */}
       <div ref={contentRef} className="flex-1 flex min-w-0 overflow-hidden">
         {/* 编辑器 */}
-        <div style={{ flex: `${100 - preview.size} 0 0%` }} className="min-w-0 overflow-hidden">
+        <div style={{ flex: `${100 - preview.size} 0 0%` }} className="flex flex-col min-w-0 overflow-hidden">
           <Editor note={activeNote} onUpdateNote={updateNote} />
         </div>
 
