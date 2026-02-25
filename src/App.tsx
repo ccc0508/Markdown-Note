@@ -47,7 +47,7 @@ function App() {
     initialSize: 50,
     minSize: 25,
     maxSize: 75,
-    direction: 'left',
+    direction: 'right',
     storageKey: 'panel-preview-pct',
   });
 
