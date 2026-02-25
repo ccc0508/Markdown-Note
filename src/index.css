@@ -40,6 +40,23 @@
   --active-bg: rgba(99, 102, 241, 0.1);
 }
 
+/* ===== 拖拽手柄 ===== */
+.drag-handle {
+  width: 4px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background-color: var(--border-color);
+  transition: background-color 0.2s, width 0.15s;
+  position: relative;
+  z-index: 10;
+}
+
+.drag-handle:hover,
+.drag-handle:active {
+  width: 4px;
+  background-color: var(--accent);
+}
+
 /* ===== 全局基础样式 ===== */
 @layer base {
   * {

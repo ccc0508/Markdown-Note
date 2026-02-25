@@ -60,7 +60,7 @@ export const NoteList = React.memo(function NoteList({
 
     return (
         <aside
-            className="w-72 min-w-[260px] flex flex-col h-full"
+            className="flex flex-col h-full w-full"
             style={{
                 backgroundColor: 'var(--bg-sidebar)',
                 borderRight: '1px solid var(--border-color)',
