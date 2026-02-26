@@ -354,3 +354,22 @@ html.is-resizing * {
 .markdown-preview>* {
   animation: fadeIn 0.2s ease-out;
 }
+
+/* ===== KaTeX 公式主题适配 ===== */
+.markdown-preview .katex {
+  color: var(--preview-text);
+  font-size: 1.05em;
+}
+
+.markdown-preview .katex-display {
+  margin: 1.5em 0;
+  padding: 1em 1.5em;
+  border-radius: 12px;
+  background: var(--preview-blockquote-bg);
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.markdown-preview .katex-display>.katex {
+  font-size: 1.15em;
+}

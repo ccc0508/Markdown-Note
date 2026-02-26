@@ -1,7 +1,9 @@
 import React, { useMemo, useCallback, type ReactNode } from 'react';
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 import rehypeRaw from 'rehype-raw';
+import rehypeKatex from 'rehype-katex';
 import type { Components } from 'react-markdown';
 import { CodeBlock } from './CodeBlock';
 import { imageStorage } from '../../utils/storage';
@@ -248,7 +250,7 @@ export const Preview = React.memo(function Preview({ content, title, onContentCh
                         {title}
                     </h1>
                 )}
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components} urlTransform={urlTransform}>
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]} components={components} urlTransform={urlTransform}>
                     {resolvedContent}
                 </ReactMarkdown>
             </article>

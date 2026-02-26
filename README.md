@@ -30,13 +30,13 @@
 - **一键格式化** — 标题、加粗、斜体、删除线、高亮、行内代码、代码块
 - **插入元素** — 链接、图片、无序/有序/任务列表、引用块、分隔线、表格
 - **智能 Toggle** — 选中已格式化文本再次点击可取消格式
-- **键盘快捷键** — `Ctrl+B` 加粗 / `Ctrl+I` 斜体 / `Ctrl+D` 删除线 / `Ctrl+E` 代码 / `Ctrl+K` 链接
+- **键盘快捷键** — `Ctrl+B` 加粗 / `Ctrl+I` 斜体 / `Ctrl+D` 删除线 / `Ctrl+E` 代码 / `Ctrl+K` 链接 / `Ctrl+M` 行内公式
 
 ### 🎨 Markdown 渲染
 - **GFM 完整支持** — 表格、删除线、脚注等 GitHub 风格语法
 - **代码块语法高亮** — 支持数十种编程语言，含一键复制按钮
 - **`==高亮文字==`** — 扩展语法，绿色高亮显示
-- **数学公式** — 行内与块级公式渲染
+- **LaTeX 数学公式** — 基于 KaTeX 引擎，支持行内公式 `$E=mc^2$` 和块级公式 `$$...$$`，自动适配主题配色
 
 ### ✅ 任务列表
 - **交互式复选框** — 在预览面板中直接点击切换 ✓/✗ 状态
@@ -101,6 +101,7 @@
 | 构建工具 | Vite 7 |
 | 样式 | Tailwind CSS 4 + CSS Custom Properties |
 | Markdown | react-markdown + remark-gfm + rehype-raw |
+| 数学公式 | remark-math + rehype-katex (KaTeX) |
 | 代码高亮 | react-syntax-highlighter (Prism) |
 | 数据持久化 | LocalStorage |
 

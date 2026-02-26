@@ -93,6 +93,24 @@ const TOOLBAR_ACTIONS: (ToolbarAction | 'separator')[] = [
     },
     'separator',
     {
+        id: 'inline-math',
+        icon: 'M4.745 3A23.933 23.933 0 003 12c0 3.183.62 6.22 1.745 9M19.255 3C20.38 5.78 21 8.817 21 12s-.62 6.22-1.745 9M12 3v18m-4.5-9H9m3 0h4.5',
+        label: '行内公式',
+        shortcut: 'Ctrl+M',
+        type: 'wrap',
+        before: '$',
+        after: '$',
+        placeholder: 'E=mc^2',
+    },
+    {
+        id: 'block-math',
+        icon: 'M4.745 3A23.933 23.933 0 003 12c0 3.183.62 6.22 1.745 9M19.255 3C20.38 5.78 21 12s-.62 6.22-1.745 9M8 12h8M9 3v18M15 3v18',
+        label: '块级公式',
+        type: 'insert',
+        insertText: '$$\n\n$$',
+    },
+    'separator',
+    {
         id: 'link',
         icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
         label: '链接',
@@ -158,6 +176,7 @@ const SHORTCUT_MAP: Record<string, string> = {
     'd': 'strikethrough',
     'e': 'inline-code',
     'k': 'link',
+    'm': 'inline-math',
 };
 
 export const Editor = React.memo(function Editor({
